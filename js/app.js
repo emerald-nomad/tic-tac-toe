@@ -3,87 +3,262 @@ $(document).ready(() => {
     startGame();
     boxEventListeners();
     
-    prepareBoard();
+    prepareGame();
 
 });
 
-//Global variables
+// Array to keep track of which spaces are filled
+let gameBoard = [0,1,2,3,4,5,6,7,8];
 
-const solutions = [
-    { 
-        possibility: true,
-        solution: [0, 1, 2]
-    },
-    {
-        possibility: true,
-        solution: [3, 4, 5]
-    },
-    {
-        possibility: true,
-        solution: [6, 7, 8]
-    },
-    {
-        possibility: true,
-        solution: [0, 3, 6]
-    },
-    {
-        possibility: true,
-        solution: [1, 4, 7]
-    },
-    {
-        possibility: true,
-        solution: [2, 5, 8]
-    },
-    {
-        possibility: true,
-        solution: [0, 4, 8]
-    },
-    {
-        possibility: true,
-        solution: [2, 4, 6]
-    },
-]
+// Number of spaces filled
+let fillCount = 0;
 
+// array of spaces on board
 const boxes = $('.box');
-let player1 = '';
-let activePlayer = true;
-let possibleSolutions = 8;
 
-let prepareBoard = () => {
+// True for player 1 turn, false for player 2
+let activePlayer = true;
+
+let player1 = {
+    name: "",
+    flag: "O",
+}
+
+let player2 = {
+    name: "Computer",
+    flag: "X",
+}
+
+// Will initiate a move by the computer
+let computerMove = () => {
+    let bestChoice = minimax(gameBoard, player2);
+    $(boxes[bestChoice.index]).trigger('click');
+}
+
+// Algorithm for computer's choice in move
+let minimax = (newBoard, player) =>{
+    // An arrya of the empty spaces on the board
+    let openSpaces = emptySpaces(newBoard);
+
+    if (winning(newBoard, player1)) {
+        // Returns a score of -10 if the human
+        // player makes a winning move
+        return { score: -10 };
+    }
+    else if (winning(newBoard, player2)) {
+        // Returns a score of 10 if the computer
+        // makes a winning move
+        return { score: 10 };
+    }
+    else if (openSpaces.length === 0) {
+        // Returns a score of 0 if there are
+        // no open spaces left
+        return { score: 0 };
+    }
+
+    // Creates an array for all the possible moves
+    let moves = [];
+
+
+    for (var i = 0; i < openSpaces.length; i++) {
+        // Creates object for the selected move
+        let move = {};
+
+        // Sets the move's index to the index 
+        // of the open space
+        move.index = newBoard[openSpaces[i]];
+
+        // Adds the player's tag to the open space
+        // of the new board
+        newBoard[openSpaces[i]] = player.flag;
+
+        // Will recursively call the function for the
+        // opposite player of who is currently runnint it
+        if (player.flag == "X") {
+            var result = minimax(newBoard, player1);
+            move.score = result.score;
+        }
+        else {
+
+            var result = minimax(newBoard, player2);
+            move.score = result.score;
+        }
+
+        // Will reset the new board to it's default state
+        newBoard[openSpaces[i]] = move.index;
+
+        // Pushes the move to to the moves array
+        moves.push(move);
+    }
+
+
+    let bestMove;
+
+    // Will choose the best move for either the 
+    // computer or human player, depending on who's running
+    // the function and store it in the bestMove variable
+    if (player.flag == "X") {
+        // Will chose best move for computer
+        let bestScore = -10000;
+        for (var i = 0; i < moves.length; i++) {
+            // If the moves[i].score is larger than
+            // the best score then make that move 
+            // the best move
+            if (moves[i].score > bestScore) {
+                bestScore = moves[i].score;
+                bestMove = i;
+            }
+        }
+    } else {
+         // Will chose best move for human
+        let bestScore = 10000;
+        for (var i = 0; i < moves.length; i++) {
+            // If the moves[i].score is less than
+            // the best score then make that move 
+            // the best move
+            if (moves[i].score < bestScore) {
+                bestScore = moves[i].score;
+                bestMove = i;
+            }
+        }
+    }
+    
+    // Function will return the best move from 
+    // the moves array
+    return moves[bestMove];
+}
+
+// Returns an array of empty spaces
+let emptySpaces = board => {
+    return board.filter(s => s != "O" && s != "X");
+}
+
+// Returns true if player has a winning move, and 
+// false otherwise
+let winning = (board, player) => {
+    if (
+        (board[0] == player.flag && board[1] == player.flag && board[2] == player.flag) ||
+        (board[3] == player.flag && board[4] == player.flag && board[5] == player.flag) ||
+        (board[6] == player.flag && board[7] == player.flag && board[8] == player.flag) ||
+        (board[0] == player.flag && board[3] == player.flag && board[6] == player.flag) ||
+        (board[1] == player.flag && board[4] == player.flag && board[7] == player.flag) ||
+        (board[2] == player.flag && board[5] == player.flag && board[8] == player.flag) ||
+        (board[0] == player.flag && board[4] == player.flag && board[8] == player.flag) ||
+        (board[2] == player.flag && board[4] == player.flag && board[6] == player.flag)
+    ) {
+        return true;
+
+    } else {
+        return false;
+    }
+}
+
+// Checks to see who wins, and changes the 
+// screen based off it.
+let checkWin = (player) => {
+    fillCount++;
+    if (
+        (gameBoard[0] == player.flag && gameBoard[1] == player.flag && gameBoard[2] == player.flag) ||
+        (gameBoard[3] == player.flag && gameBoard[4] == player.flag && gameBoard[5] == player.flag) ||
+        (gameBoard[6] == player.flag && gameBoard[7] == player.flag && gameBoard[8] == player.flag) ||
+        (gameBoard[0] == player.flag && gameBoard[3] == player.flag && gameBoard[6] == player.flag) ||
+        (gameBoard[1] == player.flag && gameBoard[4] == player.flag && gameBoard[7] == player.flag) ||
+        (gameBoard[2] == player.flag && gameBoard[5] == player.flag && gameBoard[8] == player.flag) ||
+        (gameBoard[0] == player.flag && gameBoard[4] == player.flag && gameBoard[8] == player.flag) ||
+        (gameBoard[2] == player.flag && gameBoard[4] == player.flag && gameBoard[6] == player.flag)
+    ) {
+        if (player.flag == player1.flag) {
+            // Displays the winning screen for "O", and
+            // displays player's name if set
+            console.log('Player one won.');
+            $('#board').fadeOut(1000);
+            $('#finish').addClass('screen-win-one').fadeIn(1000);
+            if (player1.name) {
+                $('.message').html(`${player1.name} won!`);
+            } else {
+                $('.message').html('Winner');
+            }
+        } else {
+            // Displays the winning screen for "X"
+            console.log('Player two won.');
+            $('#board').fadeOut(1000);
+            $('#finish').addClass('screen-win-two').fadeIn(1000);
+            $('.message').html(`${player2.name} won!`);
+        } 
+    }
+    // If every spaced is filled will display game tie screen
+    if (fillCount >= 9) {
+        console.log('Game is a draw');
+        $('#board').fadeOut(1000);
+        $('#finish').addClass('screen-win-tie').fadeIn(1000);
+        $('.message').html('Tie');
+    }
+}
+
+// Adds input for player's name
+let getUserName = () => {
+    $('#start h1').after(`
+        <div class="user_name">
+            <label for="user_name">Please enter your name</label> <input type="text" id="user_name">
+        </div>
+    `);
+}
+
+// Adds player's name to gameboard
+let addUserName = name => {
+    $('.board header').append(`
+        <p>${name}</p>
+    `)
+}
+
+// Prepare game for player
+let prepareGame = () => {
     $('#board').hide();
     $('#finish').hide();
     $('#player1').addClass('active');
-
+    getUserName();
     
 }
 
+// Makes sure everything is reset for each
+// game start
 let startGame = () => {
-    $('.button').on('click', () => {
+    $('.button').on('click', (e) => {
 
+        // If start game button is clicked, will
+        // take value from input and add it to 
+        // the game board
+        if (e.target.textContent === 'Start game') {
+            player1.name = $('#user_name')[0].value;
+            addUserName(player1.name);
+        }
+
+        // Empties every space on the board
         boxes.each(function() {
             $(this).removeClass('box-filled-1');
             $(this).removeClass('box-filled-2');
         });
 
+        // Removes screen win class from the win screen
         $('#finish').removeClass('screen-win-tie');
         $('#finish').removeClass('screen-win-one');
         $('#finish').removeClass('screen-win-two');
 
-        $(solutions).each(function() {
-            this.possibility = true;
-        })
-
+        
         $('#player1').addClass('active');
+        $('.board p').addClass('active');
         $('#player2').removeClass('active');
         $('#start').fadeOut(1000);
         $('#finish').fadeOut(1000);
         $('#board').fadeIn(1000);
 
         activePlayer = true;
-        possibleSolutions = 8;
+        gameBoard = [0,1,2,3,4,5,6,7,8];
+        fillCount = 0;
     })
 }
 
+// Returns true if the selected space is filled or not
 let isFilled = box => {
     if ($(box).hasClass('box-filled-1') || $(box).hasClass('box-filled-2')) {
         return true;
@@ -92,7 +267,12 @@ let isFilled = box => {
     }
 }
 
+// Adds event listeners for each space on board
 let boxEventListeners = () => {
+
+    // If space isn't filled will display the
+    // image for the active player when mouse
+    // hovers over
     boxes.hover(
         function () {
             if (!isFilled(this)) {
@@ -107,73 +287,52 @@ let boxEventListeners = () => {
         }
     );
 
-    boxes.click(function() {
-        if (!isFilled(this)) {
-            if (activePlayer) {
-                $(this).addClass('box-filled-1');
-                activePlayer = false;
-                $('#player1').removeClass('active');
-                $('#player2').addClass('active');
 
-            } else {
-                $(this).addClass('box-filled-2');
-                activePlayer = true;
-                $('#player2').removeClass('active');
-                $('#player1').addClass('active');
-            }
+    boxes.each( (index, box) => {
+        $(box).click(function() {
+            if (!isFilled(this)) {
+                if (activePlayer) {
+                    // Fills space will player's image
+                    $(this).addClass('box-filled-1');
 
-            checkWin();
-        }
-    });
-}
+                    // Adds player's flag to the gameBoard array
+                    gameBoard[index] = player1.flag;
 
-let checkWin = () => {
-    $(solutions).each(function(index) {
-        if (this.possibility) {
-            let fillCount = 0;
-            let p1 = 0;
-            let p2 = 0;
+                    // Will check to seen if player has made a 
+                    // winning move
+                    checkWin(player1);
 
-            $(this.solution).each( (index, value) => {
-                if (isFilled(boxes[value])) {
-                    fillCount++;
-                    $(boxes[value]).hasClass('box-filled-1') ?
-                        p1++ : p2++;
-                }
-            })
+                    // Sets player two to as the active player
+                    activePlayer = false;
 
-            console.log(index, p1,p2)
+                    // Changes visual cues for player's turn
+                    $('#player1').removeClass('active');
+                    $('.board p').removeClass('active');
+                    $('#player2').addClass('active');
 
-            if (fillCount === 2) {
-                if (p1 === 1 && p2 === 1) {
-                    this.possibility = false;
-                    possibleSolutions--;
-                }
-            }
-            
-            if (fillCount === 3) {
-                if (p1 === fillCount) {
-                    console.log('Player one won.');
-                    $('#board').fadeOut(1000);
-                    $('#finish').addClass('screen-win-one').fadeIn(1000);
-                    $('.message').html('Winner');
-                } else if (p2 === fillCount) {
-                    console.log('Player two won.');
-                    $('#board').fadeOut(1000);
-                    $('#finish').addClass('screen-win-two').fadeIn(1000);
-                    $('.message').html('Winner');
+                    // Calls the computer to make a move
+                    // after the human player's move
+                    computerMove();
                 } else {
-                    this.possibility = false;
-                    possibleSolutions--;
+                    // Fills space will player's image
+                    $(this).addClass('box-filled-2');
+
+                    // Adds player's flag to the gameBoard array
+                    gameBoard[index] = player2.flag;
+
+                    // Will check to seen if player has made a 
+                    // winning move
+                    checkWin(player2);
+
+                    // Sets player two to as the active player
+                    activePlayer = true;
+
+                    // Changes visual cues for player's turn
+                    $('#player2').removeClass('active');
+                    $('#player1').addClass('active');
+                    $('.board p').addClass('active');
                 }
             }
-        }
+        });
     })
-
-    if (possibleSolutions === 0) {
-        console.log('Game is a draw');
-        $('#board').fadeOut(1000);
-        $('#finish').addClass('screen-win-tie').fadeIn(1000);
-        $('.message').html('Tie');
-    }
 }
