@@ -73,10 +73,10 @@ let getUserName = () => {
 // Adds player's name to gameboard
 let addUserName = (player1, player2) => {
     $('.board header').append(`
-        <div>
+        
             <p class="p1">${player1}</p>
             <p class="p2">${player2}</p>
-        <div>
+        
     `)
 }
 
@@ -113,15 +113,16 @@ let startGame = () => {
         // take value from input and add it to 
         // the game board
         if (e.target.textContent === 'Start game') {
-            if (player1.name) {
+            
+            if ($('#player1-name')[0].value !== "") {
                 player1.name = $('#player1-name')[0].value;
             } else {
                 player1.name = 'Player 1';
             }
             
             if (!singlePlayer) {
-                if (player2.name) {
-                    player2.name = $('#player1-name')[0].value;
+                if ($('#player2-name')[0].value !== "") {
+                    player2.name = $('#player2-name')[0].value;
                 } else {
                     player2.name = 'Player 2';
                 }
