@@ -248,6 +248,16 @@ let boxEventListeners = () => {
 // screen based off it.
 let checkWin = (player) => {
     fillCount++;
+
+    // If every spaced is filled will display game tie screen
+    if (fillCount >= 9) {
+        console.log('Game is a draw');
+        $('#board').fadeOut(1000);
+        $('#finish').addClass('screen-win-tie').fadeIn(1000);
+        $('.message').html('Tie');
+        return;
+    }
+
     if (
         (gameBoard[0] == player.flag && gameBoard[1] == player.flag && gameBoard[2] == player.flag) ||
         (gameBoard[3] == player.flag && gameBoard[4] == player.flag && gameBoard[5] == player.flag) ||
@@ -272,13 +282,6 @@ let checkWin = (player) => {
             $('#finish').addClass('screen-win-two').fadeIn(1000);
             $('.message').html(`${player2.name} won!`);
         } 
-    }
-    // If every spaced is filled will display game tie screen
-    if (fillCount >= 9) {
-        console.log('Game is a draw');
-        $('#board').fadeOut(1000);
-        $('#finish').addClass('screen-win-tie').fadeIn(1000);
-        $('.message').html('Tie');
     }
 }
 
