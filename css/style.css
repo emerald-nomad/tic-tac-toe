@@ -15,7 +15,10 @@ h1 {
   text-align: left;
   width: 1.875em; }
 
-.button {
+.button,
+.single-player, 
+.two-players {
+  cursor: pointer;
   background: #fff;
   border-radius: 4px;
   box-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
@@ -50,11 +53,26 @@ h1 {
       color: #54D17A; }
     .screen-start h1 + .button {
       margin-top: 5em; }
+    .screen-start .users {
+      margin: 1.5em auto;
+      color: #54D17A;
+    }
+    .screen-start .users a{
+      margin: auto 1em;
+    }
     .screen-start .user_name {
-      display: block;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
       margin: 1.5em auto;
       color: #fff;
       font-size: 1.5em;
+    }
+    .user_name p {
+      width: 100%;
+    }
+    .screen-start label {
+      margin: auto 1em;
     }
     .screen-start input {
       -webkit-appearance: none;
@@ -62,10 +80,10 @@ h1 {
       border: none;
       border-radius: .2em;
       color: grey;
-      display: block;
       margin: auto;
       margin-top: .5em;
       text-align: center;
+      display: block;
     }
   .screen-win p {
     font-size: 6em;
@@ -104,15 +122,27 @@ h1 {
     margin-top: 0.3em; }
   .board p {
     display: inline-block;
-    width: 35%;
-    margin-left: 1.5em;
+    position: absolute;
     font-size: 1.75em;
-    text-align: center;
+    /* text-align: center; */
     color: rgba(0, 0, 0, 0.2);
     transition: 1s;
   }
-  .board p.active {
+  .board .p1 {
+    /* margin-left: 1.5em; */
+    /* padding-left: 1.5em; */
+    left: 9em;
+  }
+  .board .p1.active {
     color: #FFA000;
+  }
+  .board .p2 {
+    /* margin-left: auto;
+    margin-right: 1.5em; */
+    right: 8em;
+  }
+  .board .p2.active {
+    color: #3688C3;
   }
 
 .players {
@@ -143,7 +173,7 @@ h1 {
 
 .boxes {
   width: 480px;
-  margin: 3em auto 0; }
+  margin: 8em auto; }
   .boxes .box {
     background: #EFEFEF;
     border-radius: 4px;
