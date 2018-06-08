@@ -1,10 +1,9 @@
 $(document).ready(() => {
     // Event Listeners for game
+    prepareGame();
     startGame();
     boxEventListeners();
-    
-    prepareGame();
-
+    restartGame();
 });
 
 // Array to keep track of which spaces are filled
@@ -15,6 +14,9 @@ let fillCount = 0;
 
 // array of spaces on board
 const boxes = $('.box');
+
+// tic-tac-toe logo
+const logo = $('header h1');
 
 // True when single player has been chosen
 let singlePlayer = false;
@@ -73,11 +75,17 @@ let getUserName = () => {
 // Adds player's name to gameboard
 let addUserName = (player1, player2) => {
     $('.board header').append(`
-        
             <p class="p1">${player1}</p>
-            <p class="p2">${player2}</p>
-        
+            <p class="p2">${player2}</p>    
     `)
+}
+
+// Restarts the whole application
+let restartGame = () => {
+    logo.on('click', e => {
+        e.preventDefault();
+        location.reload();
+    });
 }
 
 // Prepare game for player
@@ -87,8 +95,6 @@ let prepareGame = () => {
     $('#finish').hide();
     $('#player1').addClass('active');
     howManyPlayers();
-    //getUserName();
-    
 }
 
 let playerMode = () => {
@@ -214,9 +220,7 @@ let boxEventListeners = () => {
 
                     // Calls the computer to make a move
                     // after the human player's move
-                    if (singlePlayer) {
-                        setTimeout(computerMove, 750);
-                    }
+                    computerMove();
                 } else {
                     // Fills space will player's image
                     $(this).addClass('box-filled-2');
